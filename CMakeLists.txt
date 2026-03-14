@@ -7,4 +7,6 @@ include_directories(data_structures)
 
 add_executable(DA2026_PRJ1 src/main.cpp
         data-structures/MutablePriorityQueue.h
-        data-structures/Graph.h)
+        data-structures/Graph.h
+        src/Reviewer.h
+        src/Submission.h)
