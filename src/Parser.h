@@ -71,7 +71,9 @@ inline void parseFile(const string& filename, vector<Submission>& submissions, v
                 case SUBMISSIONS: {
                     Submission s;
                     getline(ss, token, ','); s.id = stoi(trim(token));
-                    getline(ss, token, ','); s.title = trim(token);
+                    getline(ss, token, ',');
+                    token.erase(remove(token.begin(), token.end(), '"'), token.end());
+                    s.title = trim(token);
                     getline(ss, token, ','); s.authors = trim(token);
                     getline(ss, token, ','); s.email = trim(token);
                     getline(ss, token, ','); s.primary = stoi(trim(token));
