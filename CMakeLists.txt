@@ -10,4 +10,5 @@ add_executable(DA2026_PRJ1 src/main.cpp
         data-structures/Graph.h
         src/Reviewer.h
         src/Submission.h
-        src/Parser.h)
+        src/Parser.h
+        src/ConferenceManager.h)
