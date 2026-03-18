@@ -97,3 +97,20 @@ void ConferenceManager::augmentFlow(int source, int sink, double bottleneck, uno
         curr = e->getOrig()->getInfo();
     }
 }
+
+double ConferenceManager::edmondsKarp(int source, int sink) {
+    for (auto v : graph.getVertexSet()) {
+        for (auto e : v->getAdj()) {
+            e->setFlow(0);
+        }
+    }
+    double totalFlow = 0;
+    unordered_map<int, Edge<int>*> parent;
+    while (bfs(source, sink, parent)) {
+        double bottleneck = findBottleneck(source, sink, parent);
+        augmentFlow(source, sink, bottleneck, parent);
+        totalFlow += bottleneck;
+        parent.clear();
+    }
+    return totalFlow;
+}
