@@ -87,3 +87,13 @@ double ConferenceManager::findBottleneck(int source, int sink, unordered_map<int
     }
     return bottleneck;
 }
+
+void ConferenceManager::augmentFlow(int source, int sink, double bottleneck, unordered_map<int, Edge<int> *> &parent) {
+    int curr = sink;
+    while (curr != source) {
+        Edge<int>* e = parent[curr];
+        e->setFlow(e->getFlow() + bottleneck);
+        e->getReverse()->setFlow(e->getReverse()->getFlow() - bottleneck);
+        curr = e->getOrig()->getInfo();
+    }
+}
