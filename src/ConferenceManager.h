@@ -19,6 +19,8 @@ private:
     Graph<int> graph;
     unordered_map<int, Submission> submissions;
     unordered_map<int, Reviewer> reviewers;
+    unordered_map<int, int> submissionNodeIds;
+    unordered_map<int, int> reviewerNodeIds;
     Parameters params;
     // Helpers for Node ID
     int sourceId();
