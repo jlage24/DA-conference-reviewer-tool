@@ -31,3 +31,23 @@ int ConferenceManager::submissionNodeId(int submissionId) {
 int ConferenceManager::reviewerNodeId(int reviewerId) {
     return reviewerNodeIds.at(reviewerId);
 }
+
+void ConferenceManager::buildFlowGraph() {
+    graph.addVertex(sourceId());
+    graph.addVertex(sinkId());
+    for (const auto& pair : submissions) {
+        graph.addVertex(submissionNodeId(pair.first));
+        graph.addEdge(sourceId(), submissionNodeId(pair.first), params.minReviewsPerSubmission);
+    }
+    for (const auto& pair : reviewers) {
+        graph.addVertex(reviewerNodeId(pair.first));
+        graph.addEdge(reviewerNodeId(pair.first), sinkId(), params.maxReviewsPerReviewer);
+    }
+    for (const auto& sub : submissions) {
+        for (const auto& rev : reviewers) {
+            if (sub.second.primary == rev.second.primary) {
+                graph.addEdge(submissionNodeId(sub.first), reviewerNodeId(rev.first), 1);
+            }
+        }
+    }
+}
