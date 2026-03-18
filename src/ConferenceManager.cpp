@@ -75,3 +75,15 @@ bool ConferenceManager::bfs(int source, int sink, unordered_map<int, Edge<int> *
     }
     return graph.findVertex(sink)->isVisited();
 }
+
+double ConferenceManager::findBottleneck(int source, int sink, unordered_map<int, Edge<int> *> &parent) {
+    double bottleneck = INF;
+    int curr = sink;
+    while (curr != source) {
+        Edge<int>* e = parent[curr];
+        double residual = e->getWeight() - e->getFlow();
+        bottleneck = min(bottleneck, residual);
+        curr = e->getOrig()->getInfo();
+    }
+    return bottleneck;
+}
