@@ -51,3 +51,27 @@ void ConferenceManager::buildFlowGraph() {
         }
     }
 }
+
+bool ConferenceManager::bfs(int source, int sink, unordered_map<int, Edge<int> *> &parent) {
+    for (auto v : graph.getVertexSet()) {
+        v->setVisited(false);
+    }
+    queue<int> q;
+    q.push(source);
+    graph.findVertex(source)->setVisited(true);
+    while (!q.empty()) {
+        int curr = q.front(); q.pop();
+        Vertex<int>* v = graph.findVertex(curr);
+        for (auto e : v->getAdj()) {
+            int next = e->getDest()->getInfo();
+            double residual = e->getWeight() - e->getFlow();
+            Vertex<int>* nv = graph.findVertex(next);
+            if (residual > 0 && !nv->isVisited()) {
+                nv->setVisited(true);
+                parent[next] = e;
+                q.push(next);
+            }
+        }
+    }
+    return graph.findVertex(sink)->isVisited();
+}
