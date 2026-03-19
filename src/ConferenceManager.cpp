@@ -32,21 +32,30 @@ int ConferenceManager::reviewerNodeId(int reviewerId) {
     return reviewerNodeIds.at(reviewerId);
 }
 
+void ConferenceManager::addResidualEdge(int from, int to, double capacity) {
+    auto v1 = graph.findVertex(from);
+    auto v2 = graph.findVertex(to);
+    auto e1 = v1->addEdge(v2, capacity);
+    auto e2 = v2->addEdge(v1, 0);
+    e1->setReverse(e2);
+    e2->setReverse(e1);
+}
+
 void ConferenceManager::buildFlowGraph() {
     graph.addVertex(sourceId());
     graph.addVertex(sinkId());
     for (const auto& pair : submissions) {
         graph.addVertex(submissionNodeId(pair.first));
-        graph.addEdge(sourceId(), submissionNodeId(pair.first), params.minReviewsPerSubmission);
+        addResidualEdge(sourceId(), submissionNodeId(pair.first), params.minReviewsPerSubmission);
     }
     for (const auto& pair : reviewers) {
         graph.addVertex(reviewerNodeId(pair.first));
-        graph.addEdge(reviewerNodeId(pair.first), sinkId(), params.maxReviewsPerReviewer);
+        addResidualEdge(reviewerNodeId(pair.first), sinkId(), params.maxReviewsPerReviewer);
     }
     for (const auto& sub : submissions) {
         for (const auto& rev : reviewers) {
             if (sub.second.primary == rev.second.primary) {
-                graph.addEdge(submissionNodeId(sub.first), reviewerNodeId(rev.first), 1);
+                addResidualEdge(submissionNodeId(sub.first), reviewerNodeId(rev.first), 1);
             }
         }
     }

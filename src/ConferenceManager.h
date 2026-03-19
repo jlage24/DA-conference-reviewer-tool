@@ -31,6 +31,7 @@ private:
     bool bfs(int source, int sink, unordered_map<int, Edge<int>*>& parent);
     double findBottleneck(int source, int sink, unordered_map<int, Edge<int>*>& parent);
     void augmentFlow(int source, int sink, double bottleneck, unordered_map<int, Edge<int>*>& parent);
+    void addResidualEdge(int from, int to, double capacity);
 };
 
 #endif //DA2026_PRJ1_CONFERENCEMANAGER_H
