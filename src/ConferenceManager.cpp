@@ -14,6 +14,11 @@ ConferenceManager::ConferenceManager(const vector<Submission> &submissions, cons
     for (const auto& r : reviewers) {
         reviewerNodeIds[r.id] = index++;
     }
+    for (const auto& r : reviewers) {
+        reviewerNodeIds[r.id] = index;
+        reviewerIdFromNodeId[index] = r.id;
+        index++;
+    }
 }
 
 int ConferenceManager::sourceId() {
@@ -122,4 +127,47 @@ double ConferenceManager::edmondsKarp(int source, int sink) {
         parent.clear();
     }
     return totalFlow;
+}
+
+void ConferenceManager::generateAssignments() {
+    buildFlowGraph();
+    double maxFlow = edmondsKarp(sourceId(), sinkId());
+    double expected = params.minReviewsPerSubmission * submissions.size();
+    ofstream out(params.outputFileName);
+    if (maxFlow < expected) {
+        out << "#SubmissionId,Domain,MissingReviews\n";
+        for (const auto& sub : submissions) {
+            Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
+            int assigned = 0;
+            for (auto e : v->getAdj()) {
+                if (e->getDest()->getInfo() == sinkId()) continue;
+                if (e->getFlow() == 1) assigned++;
+            }
+            int missing = params.minReviewsPerSubmission - assigned;
+            if (missing > 0) {
+                out << sub.first << ", " << sub.second.primary << ", " << missing << "\n";
+            }
+        }
+    } else {
+        vector<pair<int,int>> assignments;
+        int total = 0;
+        out << "#SubmissionId,ReviewerId,Match\n";
+        for (const auto& sub : submissions) {
+            Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
+            for (auto e : v->getAdj()) {
+                if (e->getDest()->getInfo() == sinkId()) continue;
+                if (e->getFlow() == 1) {
+                    int revId = reviewerIdFromNodeId[e->getDest()->getInfo()];
+                    out << sub.first << ", " << revId << ", " << sub.second.primary << "\n";
+                    assignments.emplace_back(sub.first, revId);
+                    total++;
+                }
+            }
+        }
+        out << "#ReviewerId,SubmissionId,Match\n";
+        for (const auto& a : assignments) {
+            out << a.second << ", " << a.first << ", " << submissions[a.first].primary << "\n";
+        }
+        out << "#Total: " << total << "\n";
+    }
 }

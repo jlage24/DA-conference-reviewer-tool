@@ -21,6 +21,7 @@ private:
     unordered_map<int, Reviewer> reviewers;
     unordered_map<int, int> submissionNodeIds;
     unordered_map<int, int> reviewerNodeIds;
+    unordered_map<int, int> reviewerIdFromNodeId;
     Parameters params;
     // Helpers for Node ID
     int sourceId();
