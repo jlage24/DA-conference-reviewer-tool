@@ -14,8 +14,6 @@
 class ConferenceManager {
 public:
     ConferenceManager(const vector<Submission>& submissions, const vector<Reviewer>& reviewers, const Parameters& params);
-    void buildFlowGraph();
-    double edmondsKarp(int source, int sink);
     void generateAssignments();
     void riskAnalysis();
 
@@ -27,6 +25,8 @@ private:
     unordered_map<int, int> reviewerNodeIds;
     unordered_map<int, int> reviewerIdFromNodeId;
     Parameters params;
+    void buildFlowGraph();
+    double edmondsKarp(int source, int sink);
     // Helpers for Node ID
     int sourceId();
     int sinkId();
