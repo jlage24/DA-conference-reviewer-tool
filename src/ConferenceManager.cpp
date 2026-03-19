@@ -131,7 +131,6 @@ void ConferenceManager::generateAssignments() {
     buildFlowGraph();
     double maxFlow = edmondsKarp(sourceId(), sinkId());
     double expected = params.minReviewsPerSubmission * submissions.size();
-    // FIX: GenerateAssignments == 0 means run but do not report
     if (params.generateAssignments == 0) return;
     ofstream out(params.outputFileName);
     if (maxFlow < expected) {
@@ -180,6 +179,7 @@ void ConferenceManager::generateAssignments() {
 }
 
 void ConferenceManager::riskAnalysis() {
+    if (params.riskAnalysis == 0) return;
     vector<int> riskyReviewers;
     for (const auto& rev : reviewers) {
         Vertex<int>* v = graph.findVertex(reviewerNodeId(rev.first));
