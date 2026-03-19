@@ -2,6 +2,10 @@
 #define DA2026_PRJ1_CONFERENCEMANAGER_H
 
 #include <unordered_map>
+#include <vector>
+#include <queue>
+#include <fstream>
+#include <algorithm>
 #include "Submission.h"
 #include "Reviewer.h"
 #include "Parser.h"

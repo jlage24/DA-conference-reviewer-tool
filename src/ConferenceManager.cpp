@@ -12,9 +12,6 @@ ConferenceManager::ConferenceManager(const vector<Submission> &submissions, cons
         submissionNodeIds[s.id] = index++;
     }
     for (const auto& r : reviewers) {
-        reviewerNodeIds[r.id] = index++;
-    }
-    for (const auto& r : reviewers) {
         reviewerNodeIds[r.id] = index;
         reviewerIdFromNodeId[index] = r.id;
         index++;
@@ -47,6 +44,9 @@ void ConferenceManager::addResidualEdge(int from, int to, double capacity) {
 }
 
 void ConferenceManager::buildFlowGraph() {
+    while (!graph.getVertexSet().empty()) {
+        graph.removeVertex(graph.getVertexSet()[0]->getInfo());
+    }
     graph.addVertex(sourceId());
     graph.addVertex(sinkId());
     for (const auto& pair : submissions) {
@@ -66,10 +66,8 @@ void ConferenceManager::buildFlowGraph() {
     }
 }
 
-bool ConferenceManager::bfs(int source, int sink, unordered_map<int, Edge<int> *> &parent) {
-    for (auto v : graph.getVertexSet()) {
-        v->setVisited(false);
-    }
+bool ConferenceManager::bfs(int source, int sink, unordered_map<int, Edge<int>*>& parent) {
+    for (auto v : graph.getVertexSet()) v->setVisited(false);
     queue<int> q;
     q.push(source);
     graph.findVertex(source)->setVisited(true);
@@ -90,7 +88,7 @@ bool ConferenceManager::bfs(int source, int sink, unordered_map<int, Edge<int> *
     return graph.findVertex(sink)->isVisited();
 }
 
-double ConferenceManager::findBottleneck(int source, int sink, unordered_map<int, Edge<int> *> &parent) {
+double ConferenceManager::findBottleneck(int source, int sink, unordered_map<int, Edge<int>*>& parent) {
     double bottleneck = INF;
     int curr = sink;
     while (curr != source) {
@@ -102,7 +100,7 @@ double ConferenceManager::findBottleneck(int source, int sink, unordered_map<int
     return bottleneck;
 }
 
-void ConferenceManager::augmentFlow(int source, int sink, double bottleneck, unordered_map<int, Edge<int> *> &parent) {
+void ConferenceManager::augmentFlow(int source, int sink, double bottleneck, unordered_map<int, Edge<int>*>& parent) {
     int curr = sink;
     while (curr != source) {
         Edge<int>* e = parent[curr];
@@ -133,6 +131,8 @@ void ConferenceManager::generateAssignments() {
     buildFlowGraph();
     double maxFlow = edmondsKarp(sourceId(), sinkId());
     double expected = params.minReviewsPerSubmission * submissions.size();
+    // FIX: GenerateAssignments == 0 means run but do not report
+    if (params.generateAssignments == 0) return;
     ofstream out(params.outputFileName);
     if (maxFlow < expected) {
         out << "#SubmissionId,Domain,MissingReviews\n";
@@ -140,8 +140,8 @@ void ConferenceManager::generateAssignments() {
             Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
             int assigned = 0;
             for (auto e : v->getAdj()) {
-                if (e->getDest()->getInfo() == sinkId()) continue;
-                if (e->getFlow() == 1) assigned++;
+                if (e->getDest()->getInfo() == sourceId() || e->getDest()->getInfo() == sinkId()) continue;
+                if (e->getFlow() > 0.5) assigned++;
             }
             int missing = params.minReviewsPerSubmission - assigned;
             if (missing > 0) {
@@ -151,19 +151,26 @@ void ConferenceManager::generateAssignments() {
     } else {
         vector<pair<int,int>> assignments;
         int total = 0;
-        out << "#SubmissionId,ReviewerId,Match\n";
         for (const auto& sub : submissions) {
             Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
             for (auto e : v->getAdj()) {
-                if (e->getDest()->getInfo() == sinkId()) continue;
-                if (e->getFlow() == 1) {
+                if (e->getDest()->getInfo() == sourceId() || e->getDest()->getInfo() == sinkId()) continue;
+                if (e->getFlow() > 0.5) {
                     int revId = reviewerIdFromNodeId[e->getDest()->getInfo()];
-                    out << sub.first << ", " << revId << ", " << sub.second.primary << "\n";
                     assignments.emplace_back(sub.first, revId);
                     total++;
                 }
             }
         }
+        sort(assignments.begin(), assignments.end());
+        out << "#SubmissionId,ReviewerId,Match\n";
+        for (const auto& a : assignments) {
+            out << a.first << ", " << a.second << ", " << submissions[a.first].primary << "\n";
+        }
+        sort(assignments.begin(), assignments.end(), [](const pair<int,int>& a, const pair<int,int>& b) {
+            if (a.second != b.second) return a.second < b.second;
+            return a.first < b.first;
+        });
         out << "#ReviewerId,SubmissionId,Match\n";
         for (const auto& a : assignments) {
             out << a.second << ", " << a.first << ", " << submissions[a.first].primary << "\n";
@@ -189,11 +196,12 @@ void ConferenceManager::riskAnalysis() {
             }
         }
     }
+    sort(riskyReviewers.begin(), riskyReviewers.end());
     ofstream out(params.outputFileName, ios::app);
     out << "#Risk Analysis: " << params.riskAnalysis << "\n";
-    for (int i = 0; i < riskyReviewers.size(); i++) {
+    for (int i = 0; i < (int)riskyReviewers.size(); i++) {
         out << riskyReviewers[i];
-        if (i + 1 < riskyReviewers.size()) out << ", ";
+        if (i + 1 < (int)riskyReviewers.size()) out << ", ";
     }
     out << "\n";
 }
