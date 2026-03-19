@@ -171,3 +171,29 @@ void ConferenceManager::generateAssignments() {
         out << "#Total: " << total << "\n";
     }
 }
+
+void ConferenceManager::riskAnalysis() {
+    vector<int> riskyReviewers;
+    for (const auto& rev : reviewers) {
+        Vertex<int>* v = graph.findVertex(reviewerNodeId(rev.first));
+        for (auto e : v->getAdj()) {
+            if (e->getDest()->getInfo() == sinkId()) {
+                double original = e->getWeight();
+                e->setWeight(0);
+                double maxFlow = edmondsKarp(sourceId(), sinkId());
+                double expected = params.minReviewsPerSubmission * submissions.size();
+                if (maxFlow < expected) {
+                    riskyReviewers.push_back(rev.first);
+                }
+                e->setWeight(original);
+            }
+        }
+    }
+    ofstream out(params.outputFileName, ios::app);
+    out << "#Risk Analysis: " << params.riskAnalysis << "\n";
+    for (int i = 0; i < riskyReviewers.size(); i++) {
+        out << riskyReviewers[i];
+        if (i + 1 < riskyReviewers.size()) out << ", ";
+    }
+    out << "\n";
+}
