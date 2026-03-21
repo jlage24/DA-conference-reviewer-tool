@@ -205,3 +205,30 @@ void ConferenceManager::riskAnalysis() {
     }
     out << "\n";
 }
+
+void ConferenceManager::printSubmissions() const {
+    cout << "\n=== Submissions ===\n"; 
+    for (const auto& [id, s] : submissions) {
+        cout << id << " | " << s.title << " | " << s.primary << "\n";
+    }
+}
+
+void ConferenceManager::printReviewers() const {
+    cout << "\n=== Reviewers ===\n";
+    for (const auto& [id, r] : reviewers) {
+        cout << id << " | " << r.name << " | " << r.primary << "\n";
+    }
+}
+
+void ConferenceManager::printParameters() const {
+    cout << "\n=== Parameters ===\n";
+    cout << "MinReviewsPerSubmission: " << params.minReviewsPerSubmission << "\n";
+    cout << "MaxReviewsPerReviewer:   " << params.maxReviewsPerReviewer << "\n";
+    cout << "PrimaryReviewerExpertise: " << params.primaryReviewerExpertise << "\n";
+    cout << "SecondaryReviewerExpertise: " << params.secondaryReviewerExpertise << "\n";
+    cout << "PrimarySubmissionDomain: " << params.primarySubmissionDomain << "\n";
+    cout << "SecondarySubmissionDomain: " << params.secondarySubmissionDomain << "\n";
+    cout << "GenerateAssignments:     " << params.generateAssignments << "\n";
+    cout << "RiskAnalysis:            " << params.riskAnalysis << "\n";
+    cout << "OutputFileName:          " << params.outputFileName << "\n";
+}

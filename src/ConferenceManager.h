@@ -16,6 +16,9 @@ public:
     ConferenceManager(const vector<Submission>& submissions, const vector<Reviewer>& reviewers, const Parameters& params);
     void generateAssignments();
     void riskAnalysis();
+    void printSubmissions() const;
+    void printReviewers() const;
+    void printParameters() const;
 
 private:
     Graph<int> graph;
