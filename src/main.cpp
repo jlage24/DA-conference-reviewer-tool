@@ -28,19 +28,16 @@ int main(int argc, char* argv[]) {
         string inputFile  = argv[2];
         string outputFile = argv[3];
 
+        parseFile(inputFile, submissions, reviewers, params);
         params.outputFileName = outputFile;
 
-        parseFile(inputFile, submissions, reviewers, params);
         if (submissions.empty() && reviewers.empty()) {
             cerr << "Error: Failed to load data from file " << inputFile << ".\n";
             return 1;
         }
 
         manager = make_unique<ConferenceManager>(submissions, reviewers, params);
-
-        // 3) Garantir que generateAssignments e riskAnalysis estão ativos em batch
-        if (params.generateAssignments == 0) params.generateAssignments = 1;
-        if (params.riskAnalysis == 0)       params.riskAnalysis       = 1;
+        
 
         manager->generateAssignments();
 
