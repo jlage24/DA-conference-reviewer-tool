@@ -207,7 +207,7 @@ void ConferenceManager::riskAnalysis() {
 }
 
 void ConferenceManager::printSubmissions() const {
-    cout << "\n=== Submissions ===\n"; 
+    cout << "\n=== Submissions ===\n";
     for (const auto& [id, s] : submissions) {
         cout << id << " | " << s.title << " | " << s.primary << "\n";
     }
