@@ -14,7 +14,7 @@ void showMenu() {
     cout << "5 - Generate assignments\n";
     cout << "6 - Run risk analysis\n";
     cout << "0 - Exit\n";
-    cout << "Opção: ";
+    cout << "Option: ";
 }
 
 int main(int argc, char* argv[]) {
@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
         }
 
         manager = make_unique<ConferenceManager>(submissions, reviewers, params);
-        
+
 
         manager->generateAssignments();
 
