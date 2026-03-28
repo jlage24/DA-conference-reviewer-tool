@@ -44,6 +44,7 @@ void ConferenceManager::addResidualEdge(int from, int to, double capacity) {
 }
 
 void ConferenceManager::buildFlowGraph() {
+    matchDomains.clear();
     while (!graph.getVertexSet().empty()) {
         graph.removeVertex(graph.getVertexSet()[0]->getInfo());
     }
@@ -71,7 +72,12 @@ void ConferenceManager::buildFlowGraph() {
             const Reviewer& rev = reviewers[rid];
             int matchDomain = 0;
             if (sub.primary == rev.primary) matchDomain = sub.primary;
-            else if (params.generateAssignments >= 2 && sub.secondary != 0 && sub.secondary == rev.primary) matchDomain = sub.secondary;
+            else if (params.generateAssignments >= 2 && sub.secondary != 0 && sub.secondary == rev.primary)
+                matchDomain = sub.secondary;
+            else if (params.generateAssignments >= 3 && rev.secondary != 0 && sub.primary == rev.secondary)
+                matchDomain = sub.primary;
+            else if (params.generateAssignments >= 3 && sub.secondary != 0 && rev.secondary != 0 && sub.secondary == rev.secondary)
+                matchDomain = sub.secondary;
             if (matchDomain != 0) {
                 matchDomains[{sid, rid}] = matchDomain;
                 addResidualEdge(submissionNodeId(sid), reviewerNodeId(rid), 1);
@@ -196,6 +202,17 @@ void ConferenceManager::generateAssignments() {
 
 void ConferenceManager::riskAnalysis() {
     if (params.riskAnalysis == 0) return;
+    if (params.riskAnalysis > 1) {
+        ofstream out(params.outputFileName, ios::app);
+        out << "#Risk Analysis: " << params.riskAnalysis << "\n";
+        out << "# K>1 risk analysis not implemented.\n";
+        return;
+    }
+    buildFlowGraph();
+    // Truncate file if generateAssignments didn't already create it fresh
+    if (params.generateAssignments == 0) {
+        ofstream clear(params.outputFileName, ios::trunc);
+    }
     vector<int> riskyReviewers;
     for (const auto& rev : reviewers) {
         Vertex<int>* v = graph.findVertex(reviewerNodeId(rev.first));
@@ -224,16 +241,20 @@ void ConferenceManager::riskAnalysis() {
 
 void ConferenceManager::printSubmissions() const {
     cout << "\n=== Submissions ===\n";
-    for (const auto& [id, s] : submissions) {
-        cout << id << " | " << s.title << " | " << s.primary << "\n";
-    }
+    vector<int> ids;
+    for (const auto& [id, s] : submissions) ids.push_back(id);
+    sort(ids.begin(), ids.end());
+    for (int id : ids)
+        cout << id << " | " << submissions.at(id).title << " | " << submissions.at(id).primary << "\n";
 }
 
 void ConferenceManager::printReviewers() const {
     cout << "\n=== Reviewers ===\n";
-    for (const auto& [id, r] : reviewers) {
-        cout << id << " | " << r.name << " | " << r.primary << "\n";
-    }
+    vector<int> ids;
+    for (const auto& [id, r] : reviewers) ids.push_back(id);
+    sort(ids.begin(), ids.end());
+    for (int id : ids)
+        cout << id << " | " << reviewers.at(id).name << " | " << reviewers.at(id).primary << "\n";
 }
 
 void ConferenceManager::printParameters() const {

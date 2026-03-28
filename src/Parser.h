@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_set>
 #include "Submission.h"
 #include "Reviewer.h"
 
@@ -35,14 +36,14 @@ enum Section {
  * and output generation.
  */
 struct Parameters {
-    int minReviewsPerSubmission;   ///< Minimum number of reviewers required per submission.
-    int maxReviewsPerReviewer;     ///< Maximum number of submissions a reviewer can be assigned.
-    int primaryReviewerExpertise;  ///< Weight/flag for primary reviewer expertise matching.
-    int secondaryReviewerExpertise;///< Weight/flag for secondary reviewer expertise matching.
-    int primarySubmissionDomain;   ///< Weight/flag for primary submission domain matching.
-    int secondarySubmissionDomain; ///< Weight/flag for secondary submission domain matching.
-    int generateAssignments;       ///< Flag indicating whether to generate assignments (1) or not (0).
-    int riskAnalysis;              ///< Flag indicating whether to perform risk analysis (1) or not (0).
+    int minReviewsPerSubmission = 0;   ///< Minimum number of reviewers required per submission.
+    int maxReviewsPerReviewer = 0;     ///< Maximum number of submissions a reviewer can be assigned.
+    int primaryReviewerExpertise = 0;  ///< Weight/flag for primary reviewer expertise matching.
+    int secondaryReviewerExpertise = 0;///< Weight/flag for secondary reviewer expertise matching.
+    int primarySubmissionDomain = 0;   ///< Weight/flag for primary submission domain matching.
+    int secondarySubmissionDomain = 0; ///< Weight/flag for secondary submission domain matching.
+    int generateAssignments = 0;       ///< Flag indicating whether to generate assignments (1) or not (0).
+    int riskAnalysis = 0;              ///< Flag indicating whether to perform risk analysis (1) or not (0).
     string outputFileName = "output.csv"; ///< Name of the output file. Defaults to "output.csv".
 };
 
@@ -163,6 +164,19 @@ inline void parseFile(const string& filename, vector<Submission>& submissions, v
             submissions.clear();
             reviewers.clear();
             return;
+        }
+    }
+    unordered_set<int> subIds, revIds;
+    for (const auto& s : submissions) {
+        if (!subIds.insert(s.id).second) {
+            cout << "Error: Duplicate submission ID: " << s.id << endl;
+            submissions.clear(); reviewers.clear(); return;
+        }
+    }
+    for (const auto& r : reviewers) {
+        if (!revIds.insert(r.id).second) {
+            cout << "Error: Duplicate reviewer ID: " << r.id << endl;
+            submissions.clear(); reviewers.clear(); return;
         }
     }
 }
