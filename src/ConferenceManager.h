@@ -6,6 +6,7 @@
 #include <queue>
 #include <fstream>
 #include <algorithm>
+#include <map>
 #include "Submission.h"
 #include "Reviewer.h"
 #include "Parser.h"
@@ -94,6 +95,9 @@ private:
 
     /// Reverse map from graph node ID to reviewer ID.
     unordered_map<int, int> reviewerIdFromNodeId;
+
+    /// Map from (submissionId, reviewerId) pair to the matched domain.
+    map<pair<int,int>, int> matchDomains;
 
     /// Configuration parameters for the assignment process.
     Parameters params;
