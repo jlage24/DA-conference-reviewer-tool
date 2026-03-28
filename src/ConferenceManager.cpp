@@ -244,8 +244,16 @@ void ConferenceManager::printSubmissions() const {
     vector<int> ids;
     for (const auto& [id, s] : submissions) ids.push_back(id);
     sort(ids.begin(), ids.end());
-    for (int id : ids)
-        cout << id << " | " << submissions.at(id).title << " | " << submissions.at(id).primary << "\n";
+    for (int id : ids) {
+        const Submission& s = submissions.at(id);
+        cout << "ID: " << s.id
+             << " | Title: " << s.title
+             << " | Authors: " << s.authors
+             << " | Email: " << s.email
+             << " | Primary: " << s.primary
+             << " | Secondary: " << (s.secondary != 0 ? to_string(s.secondary) : "N/A")
+             << "\n";
+    }
 }
 
 void ConferenceManager::printReviewers() const {
@@ -253,8 +261,15 @@ void ConferenceManager::printReviewers() const {
     vector<int> ids;
     for (const auto& [id, r] : reviewers) ids.push_back(id);
     sort(ids.begin(), ids.end());
-    for (int id : ids)
-        cout << id << " | " << reviewers.at(id).name << " | " << reviewers.at(id).primary << "\n";
+    for (int id : ids) {
+        const Reviewer& r = reviewers.at(id);
+        cout << "ID: " << r.id
+             << " | Name: " << r.name
+             << " | Email: " << r.email
+             << " | Primary: " << r.primary
+             << " | Secondary: " << (r.secondary != 0 ? to_string(r.secondary) : "N/A")
+             << "\n";
+    }
 }
 
 void ConferenceManager::printParameters() const {

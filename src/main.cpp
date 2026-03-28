@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
         params.outputFileName = outputFile;
 
         if (submissions.empty() && reviewers.empty()) {
-            cerr << "Error: Failed to load data from file " << inputFile << ".\n";
+            cout << "\033[31mError: Failed to load data from file " << inputFile << ".\033[0m\n";
             return 1;
         }
 
@@ -47,9 +47,9 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc != 1 && !(argc == 4 && string(argv[1]) == "-b")) {
-        cerr << "Usage:\n"
+        cout << "\033[31mUsage:\n"
              << "  Interactive: " << argv[0] << "\n"
-             << "  Batch:       " << argv[0] << " -b input.csv output.csv\n";
+             << "  Batch:       " << argv[0] << " -b input.csv output.csv\033[0m\n";
         return 1;
     }
 
@@ -57,8 +57,10 @@ int main(int argc, char* argv[]) {
         showMenu();
         int opt;
         if (!(cin >> opt)) {
-            cerr << "Invalid input. Exiting.\n";
-            break;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\n\033[31mInvalid input. Please enter a number.\033[0m\n";
+            continue;
         }
 
         if (opt == 0) {
@@ -78,7 +80,7 @@ int main(int argc, char* argv[]) {
 
                 parseFile(filename, submissions, reviewers, params);
                 if (submissions.empty() && reviewers.empty()) {
-                    cerr << "Failed to load data (see error above).\n\n";
+                    cout << "\033[31mFailed to load data (see error above).\033[0m\n\n";
                     dataLoaded = false;
                 } else {
                     manager = make_unique<ConferenceManager>(submissions, reviewers, params);
@@ -89,7 +91,7 @@ int main(int argc, char* argv[]) {
             }
             case 2:
                 if (!dataLoaded) {
-                    cerr << "Load an input file first.\n\n";
+                    cout << "\033[31mLoad an input file first.\033[0m\n\n";
                     break;
                 }
                 manager->printSubmissions();
@@ -98,7 +100,7 @@ int main(int argc, char* argv[]) {
 
             case 3:
                 if (!dataLoaded) {
-                    cerr << "Load an input file first.\n\n";
+                    cout << "\033[31mLoad an input file first.\033[0m\n\n";
                     break;
                 }
                 manager->printReviewers();
@@ -107,7 +109,7 @@ int main(int argc, char* argv[]) {
 
             case 4:
                 if (!dataLoaded) {
-                    cerr << "Load an input file first.\n\n";
+                    cout << "\033[31mLoad an input file first.\033[0m\n\n";
                     break;
                 }
                 manager->printParameters();
@@ -116,7 +118,7 @@ int main(int argc, char* argv[]) {
 
             case 5:
                 if (!dataLoaded) {
-                    cerr << "Load an input file first.\n\n";
+                    cout << "\033[31mLoad an input file first.\033[0m\n\n";
                     break;
                 }
                 manager->generateAssignments();
@@ -125,7 +127,7 @@ int main(int argc, char* argv[]) {
 
             case 6:
                 if (!dataLoaded) {
-                    cerr << "Load an input file first.\n\n";
+                    cout << "\033[31mLoad an input file first.\033[0m\n\n";
                     break;
                 }
                 manager->riskAnalysis();
@@ -133,7 +135,7 @@ int main(int argc, char* argv[]) {
                 break;
 
             default:
-                cerr << "Invalid option. Please choose a valid menu option.\n\n";
+                cout << "\n\033[31mInvalid option. Please choose a valid menu option.\033[0m\n\n";
         }
     }
 
