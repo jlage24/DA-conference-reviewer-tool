@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
         params.outputFileName = outputFile;
 
         if (submissions.empty() && reviewers.empty()) {
-            cout << "\033[31mError: Failed to load data from file " << inputFile << ".\033[0m\n";
+            cerr << "Error: Failed to load data from file " << inputFile << ".\n";
             return 1;
         }
 
@@ -47,9 +47,9 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc != 1 && !(argc == 4 && string(argv[1]) == "-b")) {
-        cout << "\033[31mUsage:\n"
+        cerr << "Usage:\n"
              << "  Interactive: " << argv[0] << "\n"
-             << "  Batch:       " << argv[0] << " -b input.csv output.csv\033[0m\n";
+             << "  Batch:       " << argv[0] << " -b input.csv output.csv\n";
         return 1;
     }
 
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
                 } else {
                     manager = make_unique<ConferenceManager>(submissions, reviewers, params);
                     dataLoaded = true;
-                    cout << "File loaded successfully.\n\n";
+                    cout << "\033[32mFile loaded successfully.\033[0m\n\n";
                 }
                 break;
             }
