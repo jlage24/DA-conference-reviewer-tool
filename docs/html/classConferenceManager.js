@@ -17,6 +17,7 @@ var classConferenceManager =
     [ "sourceId", "classConferenceManager.html#a64016a5cc1b169e4255ab33ff0dd71fa", null ],
     [ "submissionNodeId", "classConferenceManager.html#aa32c24a115c2f76d352ca33b61758f13", null ],
     [ "graph", "classConferenceManager.html#a01db308184021b6275804f643e8d2a18", null ],
+    [ "matchDomains", "classConferenceManager.html#a56b99c0680e70c7e41e94ab0c62fa386", null ],
     [ "params", "classConferenceManager.html#accf511799fcc777d76a1c1c6a30b8426", null ],
     [ "reviewerIdFromNodeId", "classConferenceManager.html#a5ee2ef7c04abb07b911face242ef67b7", null ],
     [ "reviewerNodeIds", "classConferenceManager.html#a407a745bfda29890081f88a3d36f8d80", null ],
