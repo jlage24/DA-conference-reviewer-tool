@@ -1,0 +1,9 @@
+<map id="data&#45;structures/Graph.h" name="data&#45;structures/Graph.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="108,5,284,31"/>
+<area shape="rect" id="Node000002" href="$ConferenceManager_8h.html" title=" " alt="" coords="103,79,289,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,44,199,79,193,79,193,44"/>
+<area shape="rect" id="Node000003" href="$ConferenceManager_8cpp.html" title=" " alt="" coords="5,152,208,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="173,115,123,154,120,150,169,110"/>
+<area shape="rect" id="Node000004" href="$main_8cpp.html" title=" " alt="" coords="233,152,338,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="223,110,272,150,269,154,219,115"/>
+</map>
