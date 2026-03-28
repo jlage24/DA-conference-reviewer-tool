@@ -30,6 +30,7 @@ public:
      * @param submissions Vector of submissions to be reviewed.
      * @param reviewers   Vector of available reviewers.
      * @param params      Configuration parameters (e.g. min/max reviews).
+     * @complexity O(S + R), where S = number of submissions and R = number of reviewers.
      */
     ConferenceManager(const vector<Submission>& submissions, const vector<Reviewer>& reviewers, const Parameters& params);
 
@@ -39,6 +40,9 @@ public:
      * Runs the Edmonds-Karp algorithm on the flow network. If the maximum
      * flow meets the expected total reviews, outputs the assignments to a file.
      * Otherwise, outputs which submissions are missing reviewers.
+     *
+     * @complexity O(V * E²), dominated by the Edmonds-Karp algorithm, where V = number
+     * of vertices and E = number of edges in the flow graph.
      */
     void generateAssignments();
 
@@ -48,21 +52,27 @@ public:
      * For each reviewer, temporarily removes their capacity edge and checks
      * whether the maximum flow is still achievable. Reviewers whose removal
      * causes an infeasible assignment are considered critical and reported.
+     *
+     * @complexity O(R * V * E²), where R = number of reviewers. Runs Edmonds-Karp
+     * once per reviewer.
      */
     void riskAnalysis();
 
     /**
      * @brief Prints all submissions to standard output.
+     * @complexity O(S), where S = number of submissions.
      */
     void printSubmissions() const;
 
     /**
      * @brief Prints all reviewers to standard output.
+     * @complexity O(R), where R = number of reviewers.
      */
     void printReviewers() const;
 
     /**
      * @brief Prints the current configuration parameters to standard output.
+     * @complexity O(1).
      */
     void printParameters() const;
 
@@ -94,6 +104,9 @@ private:
      * Adds source, sink, submission, and reviewer nodes, and connects
      * them with appropriate capacity edges based on domain matching
      * and review constraints.
+     *
+     * @complexity O(S * R), where S = number of submissions and R = number of reviewers,
+     * due to the double loop for creating domain-matching edges.
      */
     void buildFlowGraph();
 
@@ -106,21 +119,26 @@ private:
      * @param source Node ID of the source vertex.
      * @param sink   Node ID of the sink vertex.
      * @return The total maximum flow value.
+     * @complexity O(V * E²), where V = number of vertices and E = number of edges
+     * in the residual graph.
      */
     double edmondsKarp(int source, int sink);
 
     // --- Node ID Helpers ---
 
     /// @brief Returns the node ID of the source vertex (always 0).
+    /// @complexity O(1).
     int sourceId();
 
     /// @brief Returns the node ID of the sink vertex (always 1).
+    /// @complexity O(1).
     int sinkId();
 
     /**
      * @brief Returns the graph node ID for a given submission.
      * @param submissionId The submission's domain ID.
      * @return Corresponding graph node ID.
+     * @complexity O(1) average case (unordered_map lookup).
      */
     int submissionNodeId(int submissionId);
 
@@ -128,6 +146,7 @@ private:
      * @brief Returns the graph node ID for a given reviewer.
      * @param reviewerId The reviewer's domain ID.
      * @return Corresponding graph node ID.
+     * @complexity O(1) average case (unordered_map lookup).
      */
     int reviewerNodeId(int reviewerId);
 
@@ -140,6 +159,8 @@ private:
      * @param sink   Node ID of the sink vertex.
      * @param parent Map populated with the edge used to reach each visited node.
      * @return True if the sink was reached (i.e. an augmenting path exists).
+     * @complexity O(V + E), where V = number of vertices and E = number of edges
+     * in the residual graph.
      */
     bool bfs(int source, int sink, unordered_map<int, Edge<int>*>& parent);
 
@@ -152,6 +173,7 @@ private:
      * @param sink   Node ID of the sink vertex.
      * @param parent Map of edges forming the augmenting path.
      * @return The bottleneck capacity of the path.
+     * @complexity O(V), where V = number of vertices in the augmenting path.
      */
     double findBottleneck(int source, int sink, unordered_map<int, Edge<int>*>& parent);
 
@@ -165,6 +187,7 @@ private:
      * @param sink       Node ID of the sink vertex.
      * @param bottleneck The amount of flow to augment.
      * @param parent     Map of edges forming the augmenting path.
+     * @complexity O(V), where V = number of vertices in the augmenting path.
      */
     void augmentFlow(int source, int sink, double bottleneck, unordered_map<int, Edge<int>*>& parent);
 
@@ -177,6 +200,7 @@ private:
      * @param from     Source node ID.
      * @param to       Destination node ID.
      * @param capacity Capacity of the forward edge.
+     * @complexity O(1).
      */
     void addResidualEdge(int from, int to, double capacity);
 };

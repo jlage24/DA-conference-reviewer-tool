@@ -1,0 +1,45 @@
+# Project metadata
+PROJECT_NAME           = "DA2026 - Project 1"
+PROJECT_NUMBER         = 1.0
+
+# Specify the input files or directories containing the source code
+INPUT                  = ./src ./data-structures
+
+# Specify the output directory for the generated documentation
+OUTPUT_DIRECTORY       = ./docs
+
+# Enable recursive search for source files in subdirectories
+RECURSIVE              = YES
+
+# Extract all entities, even if they are undocumented
+EXTRACT_ALL            = YES
+
+# Include private members in the documentation
+EXTRACT_PRIVATE        = YES
+
+# Include static members in the documentation
+EXTRACT_STATIC         = YES
+
+# Include undocumented members in the documentation
+HIDE_UNDOC_MEMBERS     = NO
+
+# Include undocumented classes in the documentation
+HIDE_UNDOC_CLASSES     = NO
+
+# Generate HTML documentation
+GENERATE_HTML          = YES
+
+# Generate LaTeX documentation 
+GENERATE_LATEX         = NO
+
+# Enable diagrams (requires Graphviz)
+HAVE_DOT               = YES
+DOT_PATH               =
+DOT_GRAPH_MAX_NODES    = 50
+GENERATE_TREEVIEW      = YES
+
+# Set the file patterns to include specific file types
+FILE_PATTERNS          = *.cpp *.h
+
+# Enable Markdown support
+MARKDOWN_SUPPORT       = YES
