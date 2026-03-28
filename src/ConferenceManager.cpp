@@ -49,18 +49,32 @@ void ConferenceManager::buildFlowGraph() {
     }
     graph.addVertex(sourceId());
     graph.addVertex(sinkId());
-    for (const auto& pair : submissions) {
-        graph.addVertex(submissionNodeId(pair.first));
-        addResidualEdge(sourceId(), submissionNodeId(pair.first), params.minReviewsPerSubmission);
+    // Submissions by growing order of ID
+    vector<int> subIds;
+    for (const auto& pair : submissions) subIds.push_back(pair.first);
+    sort(subIds.begin(), subIds.end());
+    for (int id : subIds) {
+        graph.addVertex(submissionNodeId(id));
+        addResidualEdge(sourceId(), submissionNodeId(id), params.minReviewsPerSubmission);
     }
-    for (const auto& pair : reviewers) {
-        graph.addVertex(reviewerNodeId(pair.first));
-        addResidualEdge(reviewerNodeId(pair.first), sinkId(), params.maxReviewsPerReviewer);
+    // Reviewers by growing order of ID
+    vector<int> revIds;
+    for (const auto& pair : reviewers) revIds.push_back(pair.first);
+    sort(revIds.begin(), revIds.end());
+    for (int id : revIds) {
+        graph.addVertex(reviewerNodeId(id));
+        addResidualEdge(reviewerNodeId(id), sinkId(), params.maxReviewsPerReviewer);
     }
-    for (const auto& sub : submissions) {
-        for (const auto& rev : reviewers) {
-            if (sub.second.primary == rev.second.primary) {
-                addResidualEdge(submissionNodeId(sub.first), reviewerNodeId(rev.first), 1);
+    for (int sid : subIds) {
+        for (int rid : revIds) {
+            const Submission& sub = submissions[sid];
+            const Reviewer& rev = reviewers[rid];
+            int matchDomain = 0;
+            if (sub.primary == rev.primary) matchDomain = sub.primary;
+            else if (params.generateAssignments >= 2 && sub.secondary != 0 && sub.secondary == rev.primary) matchDomain = sub.secondary;
+            if (matchDomain != 0) {
+                matchDomains[{sid, rid}] = matchDomain;
+                addResidualEdge(submissionNodeId(sid), reviewerNodeId(rid), 1);
             }
         }
     }
@@ -133,8 +147,35 @@ void ConferenceManager::generateAssignments() {
     double expected = params.minReviewsPerSubmission * submissions.size();
     if (params.generateAssignments == 0) return;
     ofstream out(params.outputFileName);
+    vector<pair<int,int>> assignments;
+    int total = 0;
+    for (const auto& sub : submissions) {
+        Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
+        for (auto e : v->getAdj()) {
+            if (e->getDest()->getInfo() == sourceId() || e->getDest()->getInfo() == sinkId()) continue;
+            if (e->getFlow() > 0.5) {
+                int revId = reviewerIdFromNodeId[e->getDest()->getInfo()];
+                assignments.emplace_back(sub.first, revId);
+                total++;
+            }
+        }
+    }
+    sort(assignments.begin(), assignments.end());
+    out << "#SubmissionId,ReviewerId,Match\n";
+    for (const auto& a : assignments) {
+        out << a.first << ", " << a.second << ", " << matchDomains[{a.first, a.second}] << "\n";
+    }
+    sort(assignments.begin(), assignments.end(), [](const pair<int,int>& a, const pair<int,int>& b) {
+        if (a.second != b.second) return a.second < b.second;
+        return a.first < b.first;
+    });
+    out << "#ReviewerId,SubmissionId,Match\n";
+    for (const auto& a : assignments) {
+        out << a.second << ", " << a.first << ", " << matchDomains[{a.first, a.second}] << "\n";
+    }
+    out << "#Total: " << total << "\n";
     if (maxFlow < expected) {
-        out << "#SubmissionId,Domain,MissingReviews\n";
+        vector<pair<int,int>> missing;
         for (const auto& sub : submissions) {
             Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
             int assigned = 0;
@@ -142,39 +183,14 @@ void ConferenceManager::generateAssignments() {
                 if (e->getDest()->getInfo() == sourceId() || e->getDest()->getInfo() == sinkId()) continue;
                 if (e->getFlow() > 0.5) assigned++;
             }
-            int missing = params.minReviewsPerSubmission - assigned;
-            if (missing > 0) {
-                out << sub.first << ", " << sub.second.primary << ", " << missing << "\n";
-            }
+            int miss = params.minReviewsPerSubmission - assigned;
+            if (miss > 0) missing.emplace_back(sub.first, miss);
         }
-    } else {
-        vector<pair<int,int>> assignments;
-        int total = 0;
-        for (const auto& sub : submissions) {
-            Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
-            for (auto e : v->getAdj()) {
-                if (e->getDest()->getInfo() == sourceId() || e->getDest()->getInfo() == sinkId()) continue;
-                if (e->getFlow() > 0.5) {
-                    int revId = reviewerIdFromNodeId[e->getDest()->getInfo()];
-                    assignments.emplace_back(sub.first, revId);
-                    total++;
-                }
-            }
+        sort(missing.begin(), missing.end());
+        out << "#SubmissionId,Domain,MissingReviews\n";
+        for (const auto& m : missing) {
+            out << m.first << ", " << submissions[m.first].primary << ", " << m.second << "\n";
         }
-        sort(assignments.begin(), assignments.end());
-        out << "#SubmissionId,ReviewerId,Match\n";
-        for (const auto& a : assignments) {
-            out << a.first << ", " << a.second << ", " << submissions[a.first].primary << "\n";
-        }
-        sort(assignments.begin(), assignments.end(), [](const pair<int,int>& a, const pair<int,int>& b) {
-            if (a.second != b.second) return a.second < b.second;
-            return a.first < b.first;
-        });
-        out << "#ReviewerId,SubmissionId,Match\n";
-        for (const auto& a : assignments) {
-            out << a.second << ", " << a.first << ", " << submissions[a.first].primary << "\n";
-        }
-        out << "#Total: " << total << "\n";
     }
 }
 
