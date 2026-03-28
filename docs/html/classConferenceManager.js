@@ -1,0 +1,26 @@
+var classConferenceManager =
+[
+    [ "ConferenceManager", "classConferenceManager.html#a13f022e2ba84895116fe3f90bbbc68c0", null ],
+    [ "addResidualEdge", "classConferenceManager.html#a53dbbeba848add88dac26b7d5429ebb6", null ],
+    [ "augmentFlow", "classConferenceManager.html#a846e96c56a62379efea3fa5f5d2acb8f", null ],
+    [ "bfs", "classConferenceManager.html#a72e1b7b64555f9c536ade899c2d25fdc", null ],
+    [ "buildFlowGraph", "classConferenceManager.html#a06b5d07115706e70b7deac5d2af7710a", null ],
+    [ "edmondsKarp", "classConferenceManager.html#a3f4a7e5ef101c9ac110794af66faa778", null ],
+    [ "findBottleneck", "classConferenceManager.html#a87860487ff17be685fb4264b821243fe", null ],
+    [ "generateAssignments", "classConferenceManager.html#aa78627ae7d61cd2a8d23ba93f59706c7", null ],
+    [ "printParameters", "classConferenceManager.html#aa51de990d2f22c3f0573259378ddcc1a", null ],
+    [ "printReviewers", "classConferenceManager.html#a0609600b8f89017fa3948003d89c6027", null ],
+    [ "printSubmissions", "classConferenceManager.html#a6c8862f45ecf34e98b0ac55b10b6c729", null ],
+    [ "reviewerNodeId", "classConferenceManager.html#a8b7124801e06f1a2c7527b7e1f0035af", null ],
+    [ "riskAnalysis", "classConferenceManager.html#a6b23460b6effe24849a1c77ec64c5f30", null ],
+    [ "sinkId", "classConferenceManager.html#aa3ee89379e5cedda4c03e03263773f45", null ],
+    [ "sourceId", "classConferenceManager.html#a64016a5cc1b169e4255ab33ff0dd71fa", null ],
+    [ "submissionNodeId", "classConferenceManager.html#aa32c24a115c2f76d352ca33b61758f13", null ],
+    [ "graph", "classConferenceManager.html#a01db308184021b6275804f643e8d2a18", null ],
+    [ "params", "classConferenceManager.html#accf511799fcc777d76a1c1c6a30b8426", null ],
+    [ "reviewerIdFromNodeId", "classConferenceManager.html#a5ee2ef7c04abb07b911face242ef67b7", null ],
+    [ "reviewerNodeIds", "classConferenceManager.html#a407a745bfda29890081f88a3d36f8d80", null ],
+    [ "reviewers", "classConferenceManager.html#a787df287c6de3ebdff9f15c17427c0ff", null ],
+    [ "submissionNodeIds", "classConferenceManager.html#afa16f4e68a15e0372eadf4305c4a7306", null ],
+    [ "submissions", "classConferenceManager.html#a8e89f8a4d4895d5088db049e46e37533", null ]
+];
