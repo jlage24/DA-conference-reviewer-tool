@@ -1,7 +1,8 @@
 #include <iostream>
 #include <memory>
-#include "Parser.h"
+
 #include "ConferenceManager.h"
+#include "Parser.h"
 
 using namespace std;
 
@@ -25,7 +26,7 @@ int main(int argc, char* argv[]) {
     unique_ptr<ConferenceManager> manager;
 
     if (argc == 4 && string(argv[1]) == "-b") {
-        string inputFile  = argv[2];
+        string inputFile = argv[2];
         string outputFile = argv[3];
 
         parseFile(inputFile, submissions, reviewers, params);
@@ -37,7 +38,6 @@ int main(int argc, char* argv[]) {
         }
 
         manager = make_unique<ConferenceManager>(submissions, reviewers, params);
-
 
         manager->generateAssignments();
 

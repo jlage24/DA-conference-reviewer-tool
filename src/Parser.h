@@ -13,35 +13,70 @@
 
 using namespace std;
 
+/**
+ * @brief Represents the current section being parsed in the input file.
+ *
+ * Used to guide the parser's behavior as it reads through the CSV file,
+ * switching context whenever a section header (e.g. \#Submissions) is encountered.
+ */
 enum Section {
-    NONE,
-    SUBMISSIONS,
-    REVIEWERS,
-    PARAMETERS,
-    CONTROL
+    NONE,        ///< No section has been identified yet.
+    SUBMISSIONS, ///< Currently parsing the submissions section.
+    REVIEWERS,   ///< Currently parsing the reviewers section.
+    PARAMETERS,  ///< Currently parsing the parameters section.
+    CONTROL      ///< Currently parsing the control section.
 };
 
+/**
+ * @brief Holds the configuration parameters for the assignment process.
+ *
+ * These values are read from the \#Parameters and \#Control sections
+ * of the input file and control the behavior of the flow algorithm
+ * and output generation.
+ */
 struct Parameters {
-    int minReviewsPerSubmission;
-    int maxReviewsPerReviewer;
-    int primaryReviewerExpertise;
-    int secondaryReviewerExpertise;
-    int primarySubmissionDomain;
-    int secondarySubmissionDomain;
-    int generateAssignments;
-    int riskAnalysis;
-    string outputFileName = "output.csv";
+    int minReviewsPerSubmission;   ///< Minimum number of reviewers required per submission.
+    int maxReviewsPerReviewer;     ///< Maximum number of submissions a reviewer can be assigned.
+    int primaryReviewerExpertise;  ///< Weight/flag for primary reviewer expertise matching.
+    int secondaryReviewerExpertise;///< Weight/flag for secondary reviewer expertise matching.
+    int primarySubmissionDomain;   ///< Weight/flag for primary submission domain matching.
+    int secondarySubmissionDomain; ///< Weight/flag for secondary submission domain matching.
+    int generateAssignments;       ///< Flag indicating whether to generate assignments (1) or not (0).
+    int riskAnalysis;              ///< Flag indicating whether to perform risk analysis (1) or not (0).
+    string outputFileName = "output.csv"; ///< Name of the output file. Defaults to "output.csv".
 };
 
+/**
+ * @brief Trims leading/trailing whitespace and carriage return characters from a string.
+ *
+ * @param s The input string to trim.
+ * @return A new string with whitespace and '\\r' characters removed from both ends.
+ */
 inline string trim(const string& s) {
     string result = s;
     result.erase(remove(result.begin(), result.end(), '\r'), result.end());
     size_t start = result.find_first_not_of(" \t");
-    if (start == string::npos) return ""; // the string is entirely whitespace
+    if (start == string::npos) return "";
     size_t end = result.find_last_not_of(" \t");
     return result.substr(start, end - start + 1);
 }
 
+/**
+ * @brief Parses a CSV input file and populates submissions, reviewers, and parameters.
+ *
+ * Reads the file line by line, switching parsing context based on section headers
+ * (\#Submissions, \#Reviewers, \#Parameters, \#Control). Inline comments (text after
+ * '\#' on a data line) are stripped before parsing. Empty lines are skipped.
+ *
+ * If an inconsistent value or out-of-range number is encountered, an error message
+ * is printed to standard output, and both the submissions and reviewers vectors are
+ * cleared before returning.
+ *
+ * @param filename    Path to the CSV input file.
+ * @param submissions Vector to be populated with parsed Submission objects.
+ * @param reviewers   Vector to be populated with parsed Reviewer objects.
+ * @param params      Parameters struct to be populated with parsed configuration values.
+ */
 inline void parseFile(const string& filename, vector<Submission>& submissions, vector<Reviewer>& reviewers, Parameters& params) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -51,13 +86,11 @@ inline void parseFile(const string& filename, vector<Submission>& submissions, v
     string line;
     Section currentSection = NONE;
     while (getline(file, line)) {
-        // Strip out any trailing carriage returns before going forward
         line.erase(remove(line.begin(), line.end(), '\r'), line.end());
         if (line == "#Submissions") { currentSection = SUBMISSIONS; continue; }
-        if (line == "#Reviewers") { currentSection = REVIEWERS; continue; }
-        if (line == "#Parameters") { currentSection = PARAMETERS; continue; }
-        if (line == "#Control") { currentSection = CONTROL; continue; }
-        // Strip inline comments, ignoring characters after the '#' until the end of the line
+        if (line == "#Reviewers")   { currentSection = REVIEWERS;   continue; }
+        if (line == "#Parameters")  { currentSection = PARAMETERS;  continue; }
+        if (line == "#Control")     { currentSection = CONTROL;     continue; }
         size_t hashPos = line.find('#');
         if (hashPos != string::npos) {
             line = line.substr(0, hashPos);
@@ -121,13 +154,11 @@ inline void parseFile(const string& filename, vector<Submission>& submissions, v
                     break;
             }
         } catch (const invalid_argument& e) {
-            // Files will be rejected if inconsistent values are found, outputting an error message
             cout << "Error: Inconsistent value detected. Expected a number, but found invalid characters in line: \n" << line << endl;
             submissions.clear();
             reviewers.clear();
             return;
         } catch (const out_of_range& e) {
-            // Files will be rejected if numerical values exceed the maximum limits of the data type
             cout << "Error: Number out of range in line: \n" << line << endl;
             submissions.clear();
             reviewers.clear();

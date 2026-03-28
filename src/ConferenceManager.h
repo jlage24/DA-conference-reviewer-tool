@@ -24,7 +24,7 @@ public:
     /**
      * @brief Constructs a ConferenceManager with the given submissions, reviewers, and parameters.
      *
-     * Initialises internal maps for submissions and reviewers, and assigns
+     * Initializes internal maps for submissions and reviewers, and assigns
      * unique graph node IDs to each submission and reviewer.
      *
      * @param submissions Vector of submissions to be reviewed.
