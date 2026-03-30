@@ -151,36 +151,36 @@ void ConferenceManager::generateAssignments() {
     buildFlowGraph();
     double maxFlow = edmondsKarp(sourceId(), sinkId());
     double expected = params.minReviewsPerSubmission * submissions.size();
+    if (params.generateAssignments == 0) return;
     ofstream out(params.outputFileName);
-    if (maxFlow == expected) {
-        vector<pair<int,int>> assignments;
-        int total = 0;
-        for (const auto& sub : submissions) {
-            Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
-            for (auto e : v->getAdj()) {
-                if (e->getDest()->getInfo() == sourceId() || e->getDest()->getInfo() == sinkId()) continue;
-                if (e->getFlow() > 0.5) {
-                    int revId = reviewerIdFromNodeId[e->getDest()->getInfo()];
-                    assignments.emplace_back(sub.first, revId);
-                    total++;
-                }
+    vector<pair<int,int>> assignments;
+    int total = 0;
+    for (const auto& sub : submissions) {
+        Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
+        for (auto e : v->getAdj()) {
+            if (e->getDest()->getInfo() == sourceId() || e->getDest()->getInfo() == sinkId()) continue;
+            if (e->getFlow() > 0.5) {
+                int revId = reviewerIdFromNodeId[e->getDest()->getInfo()];
+                assignments.emplace_back(sub.first, revId);
+                total++;
             }
         }
-        sort(assignments.begin(), assignments.end());
-        out << "#SubmissionId,ReviewerId,Match\n";
-        for (const auto& a : assignments) {
-            out << a.first << ", " << a.second << ", " << matchDomains[{a.first, a.second}] << "\n";
-        }
-        sort(assignments.begin(), assignments.end(), [](const pair<int,int>& a, const pair<int,int>& b) {
-            if (a.second != b.second) return a.second < b.second;
-            return a.first < b.first;
-        });
-        out << "#ReviewerId,SubmissionId,Match\n";
-        for (const auto& a : assignments) {
-            out << a.second << ", " << a.first << ", " << matchDomains[{a.first, a.second}] << "\n";
-        }
-        out << "#Total: " << total << "\n";
-    } else {
+    }
+    sort(assignments.begin(), assignments.end());
+    out << "#SubmissionId,ReviewerId,Match\n";
+    for (const auto& a : assignments) {
+        out << a.first << ", " << a.second << ", " << matchDomains[{a.first, a.second}] << "\n";
+    }
+    sort(assignments.begin(), assignments.end(), [](const pair<int,int>& a, const pair<int,int>& b) {
+        if (a.second != b.second) return a.second < b.second;
+        return a.first < b.first;
+    });
+    out << "#ReviewerId,SubmissionId,Match\n";
+    for (const auto& a : assignments) {
+        out << a.second << ", " << a.first << ", " << matchDomains[{a.first, a.second}] << "\n";
+    }
+    out << "#Total: " << total << "\n";
+    if (maxFlow < expected) {
         vector<pair<int,int>> missing;
         for (const auto& sub : submissions) {
             Vertex<int>* v = graph.findVertex(submissionNodeId(sub.first));
