@@ -151,6 +151,7 @@ void ConferenceManager::generateAssignments() {
     buildFlowGraph();
     double maxFlow = edmondsKarp(sourceId(), sinkId());
     double expected = params.minReviewsPerSubmission * submissions.size();
+    if (params.generateAssignments == 0) return;
     ofstream out(params.outputFileName);
     if (maxFlow == expected) {
         vector<pair<int,int>> assignments;
